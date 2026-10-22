@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TorrSee — Агрегатор торрент-трекеров для Android</title>
+    <meta name="description" content="Удобный агрегатор торрент-трекеров для Android: поиск по Kinozal, Rutracker, генерация magnet-ссылок и современный Material 3 интерфейс.">
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="TorrSee — Агрегатор торрент-трекеров">
+    <meta property="og:description" content="Поиск по раздачам, фильтрация по качеству, генерация magnet-ссылок и автозагрузка постеров.">
+    <meta property="og:type" content="website">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --surface-color: #1e293b;
+            --surface-hover: #334155;
+            --primary-color: #38bdf8;
+            --primary-gradient: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
+            --accent-color: #f59e0b;
+            --text-color: #f8fafc;
+            --text-secondary: #94a3b8;
+            --border-color: #334155;
+            --radius-lg: 16px;
+            --radius-md: 12px;
+            --shadow-glow: 0 0 40px rgba(56, 189, 248, 0.15);
+        }
+
+        /* Theme 2: Cyberpunk Purple/Pink */
+        body.theme-cyber {
+            --bg-color: #090d16;
+            --surface-color: #131b2e;
+            --surface-hover: #1c2842;
+            --primary-color: #a855f7;
+            --primary-gradient: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+            --accent-color: #10b981;
+            --text-color: #f8fafc;
+            --text-secondary: #a1a1aa;
+            --border-color: #27272a;
+            --shadow-glow: 0 0 40px rgba(168, 85, 247, 0.25);
+        }
+
+        /* Theme 3: Emerald Matrix */
+        body.theme-emerald {
+            --bg-color: #061512;
+            --surface-color: #0d2620;
+            --surface-hover: #153830;
+            --primary-color: #10b981;
+            --primary-gradient: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+            --accent-color: #f59e0b;
+            --text-color: #f8fafc;
+            --text-secondary: #94a3b8;
+            --border-color: #1a4d40;
+            --shadow-glow: 0 0 40px rgba(16, 185, 129, 0.25);
+        }
+
+        /* Theme 4: Sunset Amber */
+        body.theme-sunset {
+            --bg-color: #1a0f0a;
+            --surface-color: #2c1a12;
+            --surface-hover: #3d251a;
+            --primary-color: #f59e0b;
+            --primary-gradient: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+            --accent-color: #38bdf8;
+            --text-color: #fff7ed;
+            --text-secondary: #a8a29e;
+            --border-color: #442a1d;
+            --shadow-glow: 0 0 40px rgba(245, 158, 11, 0.25);
+        }
+
+        /* Theme 5: Electric Indigo */
+        body.theme-indigo {
+            --bg-color: #0c0f1d;
+            --surface-color: #161a33;
+            --surface-hover: #21274a;
+            --primary-color: #6366f1;
+            --primary-gradient: linear-gradient(135deg, #6366f1 0%, #06b6d4 100%);
+            --accent-color: #f43f5e;
+            --text-color: #f8fafc;
+            --text-secondary: #94a3b8;
+            --border-color: #2a315c;
+            --shadow-glow: 0 0 40px rgba(99, 102, 241, 0.25);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            overflow-x: hidden;
+            transition: background-color 0.4s ease, color 0.4s ease;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* Navigation */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            transition: background 0.4s ease, border-color 0.4s ease;
+        }
+
+        .nav-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 72px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 800;
+            font-size: 1.25rem;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--primary-gradient);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: #0f172a;
+            font-weight: 900;
+            transition: background 0.4s ease;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+
+        .theme-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff007f, #7928ca, #00dfd8, #f59e0b);
+            background-size: 200% 200%;
+            animation: rainbowGradient 4s ease infinite;
+            color: #ffffff;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            font-weight: 800;
+            font-size: 1.15rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            margin-left: 6px;
+            box-shadow: 0 0 12px rgba(121, 40, 202, 0.5);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .theme-btn:hover {
+            transform: scale(1.2) rotate(20deg);
+            box-shadow: 0 0 20px rgba(0, 223, 216, 0.8), 0 0 30px rgba(255, 0, 127, 0.6);
+            border-color: #ffffff;
+        }
+
+        @keyframes rainbowGradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: 9999px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border: none;
+            font-size: 0.95rem;
+        }
+
+        .btn-primary {
+            background: var(--primary-gradient);
+            color: #0f172a;
+            box-shadow: 0 4px 14px rgba(56, 189, 248, 0.3);
+            transition: background 0.4s ease, box-shadow 0.4s ease, transform 0.2s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(56, 189, 248, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--surface-color);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--surface-hover);
+            border-color: var(--primary-color);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 60px 0 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .hero-glow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(56, 189, 248, 0.12) 0%, rgba(15, 23, 42, 0) 70%);
+            pointer-events: none;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 16px;
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            border-radius: 9999px;
+            color: var(--primary-color);
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 24px;
+            transition: color 0.4s ease, border-color 0.4s ease, background 0.4s ease;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 20px;
+            line-height: 1.15;
+        }
+
+        .hero h1 span {
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            transition: background 0.4s ease;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            max-width: 680px;
+            margin: 0 auto 36px;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* Features Section */
+        .features {
+            padding: 20px 0 40px;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .section-title h2 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .section-title p {
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+        }
+
+        .feature-card {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            transition: all 0.4s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--primary-color);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(56, 189, 248, 0.1);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+
+        .feature-card h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .feature-card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        /* Support / Coffee Section */
+        .support {
+            padding: 30px 0 60px;
+            text-align: center;
+        }
+
+        .support-card {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: var(--radius-lg);
+            padding: 48px 24px;
+            max-width: 700px;
+            margin: 0 auto;
+            transition: background 0.4s ease;
+        }
+
+        .coffee-icon {
+            font-size: 2.5rem;
+            margin-bottom: 16px;
+        }
+
+        .support-card h3 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .support-card p {
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+        }
+
+        .btn-coffee {
+            background: #d97706;
+            color: #ffffff;
+            font-weight: 700;
+            box-shadow: 0 4px 14px rgba(217, 119, 6, 0.3);
+        }
+
+        .btn-coffee:hover {
+            background: #b45309;
+            transform: translateY(-2px);
+        }
+
+        /* Footer */
+        footer {
+            border-top: 1px solid var(--border-color);
+            padding: 32px 0;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-align: center;
+            transition: border-color 0.4s ease;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.4rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation Header -->
+    <header>
+        <div class="container nav-inner">
+            <a href="#" class="logo">
+                <div class="logo-icon">T</div>
+                <span>TorrSee</span>
+            </a>
+            <div class="nav-links">
+                <a href="#features">Возможности</a>
+                <a href="#download">Скачать</a>
+                <a href="#support">Поддержать</a>
+                <button id="themeToggle" class="theme-btn" title="Переключить цветовую тему">?</button>
+            </div>
+            <a href="https://github.com/TorrSee/torrsee.github.io/releases" target="_blank" class="btn btn-primary">Скачать APK</a>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-glow"></div>
+        <div class="container">
+            <div class="badge">
+                🚀 Версия 0.2.0 • Android 10+
+            </div>
+            <h1>Агрегатор торрент-трекеров <span>нового поколения</span></h1>
+            <p>Удобный и быстрый поиск по раздачам Kinozal.tv и Rutracker.org, автоматическая генерация magnet-ссылок и Material 3 интерфейс без рекламы.</p>
+
+            <div class="hero-buttons" id="download">
+                <a href="https://github.com/TorrSee/torrsee.github.io/releases" target="_blank" class="btn btn-primary" style="padding: 14px 28px; font-size: 1.05rem;">
+                    ⬇️ Скачать APK (Release)
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="container">
+            <div class="section-title">
+                <h2>Главные возможности</h2>
+                <p>Всё самое необходимое для комфортного поиска и работы с раздачами</p>
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🌐</div>
+                    <h3>Поддержка Kinozal & Rutracker</h3>
+                    <p>Полноценная интеграция с ведущими трекерами, авторизация, обход блокировок и настройка зеркал.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🧲</div>
+                    <h3>Генерация Magnet-ссылок</h3>
+                    <p>Мгновенное извлечение и копирование magnet-ссылок в буфер обмена для прямой передачи в торрент-клиент.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🎨</div>
+                    <h3>Material 3 Дизайн</h3>
+                    <p>Поддержка светлой и темной темы с возможностью настройки цветовой схемы и акцентных оттенков.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🛡️</div>
+                    <h3>Обход Cloudflare</h3>
+                    <p>Встроенный интерактивный контроллер для безопасного прохождения проверок защиты и капчи.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">📁</div>
+                    <h3>Кастомные списки</h3>
+                    <p>Создавайте собственные категории и подборки с гибкой сортировкой по сидам, дате или размеру.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🔍</div>
+                    <h3>Мультитрекерный поиск</h3>
+                    <p>Ищите интересующие фильмы, сериалы, игры и программы одновременно по разным трекерам с фильтрацией по категориям.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Support Section -->
+    <section class="support" id="support">
+        <div class="container">
+            <div class="support-card">
+                <div class="coffee-icon">☕</div>
+                <h3>Понравилось приложение?</h3>
+                <p>Вы можете поддержать разработчика и угостить чашечкой кофе для мотивации и дальнейшего развития проекта!</p>
+                <a href="https://choco.tips/qr/31432531" target="_blank" class="btn btn-coffee">
+                    ☕ Купить мне кофе
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>© 2026+ TorrSee. @nothoney-notmoney</p>
+        </div>
+    </footer>
+
+    <script>
+        const themeBtn = document.getElementById('themeToggle');
+        const themes = ['', 'theme-cyber', 'theme-emerald', 'theme-sunset', 'theme-indigo'];
+        let currentThemeIndex = 0;
+
+        if (themeBtn) {
+            themeBtn.addEventListener('click', () => {
+                if (themes[currentThemeIndex]) {
+                    document.body.classList.remove(themes[currentThemeIndex]);
+                }
+                currentThemeIndex = (currentThemeIndex + 1) % themes.length;
+                if (themes[currentThemeIndex]) {
+                    document.body.classList.add(themes[currentThemeIndex]);
+                }
+            });
+        }
+    </script>
+</body>
+</html>
